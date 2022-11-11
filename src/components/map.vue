@@ -10,8 +10,8 @@
         <br>
         <br>
         <form action="" class="form">
-            <input v-model="latitude" type="text" id="latitude" placeholder="latitude">
-            <input v-model="longitude" type="text" id="longitude" placeholder="longitude">
+            <input type="text" id="latitude" placeholder="latitude" :value="latitude" @input='$emit("latitude", $event.target.value)' />
+            <input type="text" id="longitude" placeholder="longitude" :value="longitude" @input='$emit("longitude", $event.target.value)' />
         </form>
         <br>
         <br>
@@ -30,42 +30,57 @@ export default {
   name: "LeafletMap",
   data() {
     return {
-      map: null
+      map: null,
+      latitude: null,
+      longitude: null
     };
   },
+
+  emits: ['latitude', 'longitude'],
+
   props: {
     msg: String
   },
+
+  watch: {
+    latitude() {
+      this.$emit("latitude", this.latitude);
+    },
+
+    longitude() {
+      this.$emit("longitude", this.longitude);
+    }
+  },
+
   mounted() {
     let recaptchaScript = document.createElement('script')
-      recaptchaScript.setAttribute('src', 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js')
-      document.head.appendChild(recaptchaScript)
+    recaptchaScript.setAttribute('src', 'https://unpkg.com/leaflet@1.7.1/dist/leaflet.js')
+    document.head.appendChild(recaptchaScript)
 
     let mapOptions = {
     center:[52.224, 21.025],
-    zoom:10
-
-}
-
-let map = new L.map('map' , mapOptions);
-
-let layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
-map.addLayer(layer);
-
-
-let marker = null;
-map.on('click', (event)=> {
-
-    if(marker !== null){
-        map.removeLayer(marker);
+    zoom:10,
     }
 
-    marker = L.marker([event.latlng.lat , event.latlng.lng]).addTo(map);
+    let map = new L.map('map' , mapOptions);
 
-    document.getElementById('latitude').value = event.latlng.lat;
-    document.getElementById('longitude').value = event.latlng.lng;
-    
-})
+    let layer = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png');
+    map.addLayer(layer);
+
+    let self = this;
+    let marker = null;
+
+    map.on('click', (event)=> {
+
+      if(marker !== null){
+          map.removeLayer(marker);
+      }
+
+      marker = L.marker([event.latlng.lat , event.latlng.lng]).addTo(map);
+      
+      self.latitude = event.latlng.lat;
+      self.longitude = event.latlng.lng;
+    })
   }
 };
 </script>
