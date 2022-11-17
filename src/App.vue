@@ -22,7 +22,7 @@
       </select>
     <br>
     <label class="text1" for="area">Area:</label>
-      <input v-model.number="posts.area" type="number" id="area" name="area" min="10.00" step="0.01" oninput="validity.valid||(value='');">
+      <input v-model.number="posts.area" id="area" name="area" type="number" min="0" step='0.01' oninput="validity.valid||(value='');">
     <br>
     <label class="text1" for="rooms">No of rooms:</label>
       <select v-model.number="posts.rooms" name="rooms" id="rooms">
@@ -114,6 +114,19 @@ export default {
       })
     },
 
+    error() {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'NIC NIE DZIAŁA!',
+        width: 1000,
+        padding: '3em',
+        color: '#ffffff',
+        background:  '#2e2e2e',
+      confirmButtonColor: "#1beabd"
+      })
+    },
+
     postData() {
 
 			let self = this;
@@ -129,7 +142,10 @@ export default {
         "latitude": self.posts.latitude
       }).then(function (response) {
         self.search1(response.data.result.price);
-			});
+			})
+      .catch(function(){
+        self.error();
+      });
 		},
   }
 }
